@@ -1,0 +1,16 @@
+[
+{
+  "modid": "mcmusicplayer",
+  "name": "MCMusic Player",
+  "description": "Provides an ingame menu for controlling music.",
+  "version": "1.0",
+  "mcversion": "1.11.2",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["its_meow"],
+  "credits": "its_meow, for everything in this mod. Various forums for help with issues.",
+  "logoFile": "mcmusicplayer.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]
