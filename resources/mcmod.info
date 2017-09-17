@@ -2,13 +2,13 @@
 {
   "modid": "mcmusicplayer",
   "name": "MCMusic Player",
-  "description": "Provides an ingame menu for controlling music.",
+  "description": "Provides an ingame menu for playing music!",
   "version": "1.0",
-  "mcversion": "1.11.2",
-  "url": "",
-  "updateUrl": "",
+  "mcversion": "1.12.1",
+  "url": "itsmeow.net16.net",
+  "updateUrl": "http://minecraft.curseforge.com/projects/mcmusicplayer",
   "authorList": ["its_meow"],
-  "credits": "its_meow, for everything in this mod. Various forums for help with issues.",
+  "credits": "its_meow, for everything in this mod.",
   "logoFile": "mcmusicplayer.png",
   "screenshots": [],
   "dependencies": []

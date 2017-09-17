@@ -1,9 +1,12 @@
 package its_meow.mcmusicplayer.proxy;
 
+import its_meow.mcmusicplayer.EventHandler;
 import its_meow.mcmusicplayer.MCMusicPlayerMod;
 import its_meow.mcmusicplayer.config.MCMusicPlayerConfig;
 
 import java.io.File;
+
+import javax.sound.sampled.LineUnavailableException;
 
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.item.ItemStack;
@@ -19,19 +22,26 @@ import net.minecraftforge.oredict.OreDictionary;
 public class CommonProxy {
 
 	public static Configuration config;
+	public static File configDirectory;
 	
 	public void preInit(FMLPreInitializationEvent e) {
-		System.out.println("Common Pre-Init");
 		File directory = e.getModConfigurationDirectory();
+		configDirectory = directory;
         config = new Configuration(new File(directory.getPath(), "/mcmusicplayer/mcmusicplayer.cfg")); 
         MCMusicPlayerConfig.readConfig();
+        EventHandler handler = new EventHandler();
+		MinecraftForge.EVENT_BUS.register(handler);
 	}
 	
 	public void Init(FMLInitializationEvent e) {
-		System.out.println("Common Init(blank)");
 	}
 	
 	public void postInit(FMLPostInitializationEvent e){
+		try {
+			MCMusicPlayerMod.musicManager.init();
+		} catch (LineUnavailableException e1) {
+			e1.printStackTrace();
+		}
 		if(config.hasChanged()){
 			config.save();
 		}
