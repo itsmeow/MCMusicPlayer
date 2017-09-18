@@ -33,7 +33,6 @@ public class EventHandler {
 			ScaledResolution scaledRes = new ScaledResolution(mc);
 			int width = scaledRes.getScaledWidth();
 			int height = scaledRes.getScaledHeight();
-			
 			GuiButton button = new GuiButton(5604, width / 2 - 100, (height / 8) * 6, "Music");
 			event.getButtonList().add(button);
 		}

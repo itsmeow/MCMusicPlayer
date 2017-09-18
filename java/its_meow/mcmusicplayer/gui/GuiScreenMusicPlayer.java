@@ -44,7 +44,7 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 		buttonNext = new GuiButton(5607, buttonPlay.x + 215, buttonPlay.y, 30, 20, "Next"); // Next 5607
 		buttonBack = new GuiButton(5605, buttonPlay.x - 45, buttonPlay.y, 30, 20, "Back"); // Back: 5605
 		buttonDone = new GuiButton(5608, width / 2 - 50, (height / 8) * 6, 100, 20, "Done"); // Done: 5608
-		buttonStop = new GuiButton(5609, buttonPlay.x, buttonPlay.y, buttonPlay.width, buttonPlay.height, "Stop"); // Stop: 5609
+		buttonStop = new GuiButton(5609, buttonPlay.x, buttonPlay.y + 20, buttonPlay.width, buttonPlay.height, "Stop"); // Stop: 5609
 
 		GuiButton[] buttons = {
 				buttonPlay,
