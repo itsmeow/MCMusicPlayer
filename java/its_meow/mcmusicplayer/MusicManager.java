@@ -1,66 +1,70 @@
 package its_meow.mcmusicplayer;
 
 import java.io.File;
-import java.io.IOException;
-
-import javax.sound.sampled.AudioFileFormat.Type;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioFormat.Encoding;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.DataLine.Info;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
-import javax.sound.sampled.UnsupportedAudioFileException;
-
-import com.connormahaffey.JavaMusicExample.Music;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 import its_meow.mcmusicplayer.proxy.CommonProxy;
-import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.ISound;
+import net.minecraft.client.audio.SoundHandler;
+import net.minecraft.client.audio.SoundManager;
+import net.minecraft.util.SoundCategory;
+import net.minecraftforge.client.event.sound.PlaySoundEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import paulscode.sound.IStreamListener;
+import paulscode.sound.SoundSystem;
+import paulscode.sound.SoundSystemConfig;
 
 public class MusicManager {
 
 	File songFolder;
+	File songFolderOgg;
+	File[] oggs;
 	int trackNum = -1;
-	Music music;
+	//Music music;
 	
-	public void init() throws LineUnavailableException {
+	public void init() {
 		songFolder = new File(CommonProxy.configDirectory, "/mcmusicplayer/songs/");
 		if(!songFolder.exists()) {
 			songFolder.mkdirs();
 		}
-		music = new Music();
-	}
-
-	public File[] songsInFolder() {
-		int mp3count = 0;
-		File[] files = songFolder.listFiles();
-		File[] mp3s = new File[300];
-		if(files.length != 0) {
-			System.out.println("Files found in songs folder: " + files.length);
-			for(int i = 0; i < files.length; i++) {
-				File fileIn = files[i];
-				if(fileIn.getAbsolutePath().endsWith(".mp3")) {
-					mp3count++;
-					mp3s[i] = fileIn;
-				}
+		songFolderOgg = new File(CommonProxy.configDirectory, "/mcmusicplayer/songs/oggs");
+		if(!songFolderOgg.exists()) {
+			songFolderOgg.mkdirs();
+		}
+		File[] mp3s = songsInFolder();
+		List<File> oggsList = new ArrayList<File>();
+		for(File mp3 : mp3s) {
+			if(mp3 != null) {
+				File ogg = new File(songFolderOgg.getAbsolutePath() + mp3.getName().substring(0, mp3.getName().indexOf(".mp3")) + ".ogg");
+				mp3.renameTo(ogg);
+				oggsList.add(ogg);
 			}
 		}
-		return mp3s;
+		oggs = (File[]) oggsList.toArray();
+	}
+	
+	public File[] songsInFolder() {
+		int mp3count = 0;
+		File[] files = songFolder.listFiles(new FileFilterMp3());
+		return files;
 	}
 	
 	public void nextSong() {
 		if(trackNum == -1) {
-			music.stop(); // Close old song
+			pauseSong(); // Close old song
 			playSong();
 		} else {
 			File[] songs = songsInFolder();
 			if(trackNum != songs.length) {
 				trackNum++;
-				music.stop(); // Close old song
+				pauseSong(); // Close old song
 				playSong();
 			}
 		}
@@ -72,12 +76,12 @@ public class MusicManager {
 		} else {
 			if(trackNum != 0) {
 				trackNum--;
-				music.stop(); // Close old song
+				pauseSong(); // Close old song
 				playSong();
 			} else {
 				File[] songs = songsInFolder();
 				trackNum = songs.length;
-				music.stop(); // Close old song
+				pauseSong(); // Close old song
 				playSong();
 			}
 		}
@@ -87,7 +91,7 @@ public class MusicManager {
 		if(trackNum == -1) {
 			playSong();
 		} else {
-			music.stop();
+			pauseSong();
 		}
 	}
 	
@@ -109,11 +113,17 @@ public class MusicManager {
 			}
 		}
 		System.out.println("Playing File: " + song.getAbsoluteFile());
-		if(music.isPlaying()) {
-			music.stop();
-		}
-		music.loadFile(song.getAbsolutePath());
-		music.play();
+		pauseSong();
+		// Play Song
 			
 	}
+	
+	
+	
+	
+	
+
+	
+	
+	
 }

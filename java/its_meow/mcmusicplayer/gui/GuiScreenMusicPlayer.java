@@ -80,26 +80,26 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 
 	@Override
 	protected void actionPerformed(GuiButton button) throws IOException {
-		MusicManager mng = MCMusicPlayerMod.musicManager;
 		if(button == buttonDone) {
 			mc.displayGuiScreen(null);
 			this.onGuiClosed();
 		}
+		buttonPlay.enabled = true;
 		if(button == buttonPlay && buttonPlay.enabled) {
-			mng.playSong();
+			MCMusicPlayerMod.musicManager.playSong();
 			buttonPlay.visible = false;
 			buttonPlay.enabled = false;
 			buttonStop.visible = true;
 			buttonStop.enabled = true;
 		}
 		if(button == buttonNext) {
-			mng.nextSong();
+			MCMusicPlayerMod.musicManager.nextSong();
 		}
 		if(button == buttonBack) {
-			mng.lastSong();
+			MCMusicPlayerMod.musicManager.lastSong();
 		}
 		if(button == buttonStop && buttonStop.enabled) {
-			mng.pauseSong();
+			MCMusicPlayerMod.musicManager.pauseSong();
 			buttonStop.visible = false;
 			buttonStop.enabled = false;
 			buttonPlay.visible = true;

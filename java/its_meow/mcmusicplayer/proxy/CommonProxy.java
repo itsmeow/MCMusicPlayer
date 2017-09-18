@@ -37,11 +37,7 @@ public class CommonProxy {
 	}
 	
 	public void postInit(FMLPostInitializationEvent e){
-		try {
-			MCMusicPlayerMod.musicManager.init();
-		} catch (LineUnavailableException e1) {
-			e1.printStackTrace();
-		}
+		MCMusicPlayerMod.musicManager.init();
 		if(config.hasChanged()){
 			config.save();
 		}
