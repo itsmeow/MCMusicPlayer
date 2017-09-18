@@ -108,9 +108,11 @@ public class MusicManager {
 			playSong();
 		} else {
 			if(ogg != null) {
-				ResourceLocation soundResLoc = new ResourceLocation(ogg.getAbsolutePath());
-				ISound sound = new SoundThing(soundResLoc, String.valueOf(trackNum));
-				Minecraft.getMinecraft().getSoundHandler().stopSound(sound);
+				ss.stop(ogg.getName());
+				
+				//ResourceLocation soundResLoc = new ResourceLocation(ogg.getAbsolutePath());
+				//ISound sound = new SoundThing(soundResLoc, String.valueOf(trackNum));
+				//Minecraft.getMinecraft().getSoundHandler().stopSound(sound);
 			} else {
 				playSong();
 			}
@@ -143,7 +145,7 @@ public class MusicManager {
 		// Play Song
 
 		try {
-			ss.newSource(true, ogg.getName(), ogg.toURI().toURL(), String.valueOf(trackNum), false, 0, 0, 0, 1, 1);
+			ss.newSource(true, ogg.getName(), ogg.toURI().toURL(), ogg.getName(), false, 0, 0, 0, 1, 1);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
