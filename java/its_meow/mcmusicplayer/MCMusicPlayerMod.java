@@ -1,6 +1,7 @@
 package its_meow.mcmusicplayer;
 
 import its_meow.mcmusicplayer.gui.GuiScreenMusicPlayer;
+import its_meow.mcmusicplayer.music.MusicManager;
 import its_meow.mcmusicplayer.proxy.CommonProxy;
 
 import org.apache.logging.log4j.Logger;

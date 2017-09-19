@@ -1,4 +1,4 @@
-package its_meow.mcmusicplayer;
+package its_meow.mcmusicplayer.music;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +13,7 @@ import javax.sound.sampled.AudioFormat;
 
 import org.apache.commons.io.FileUtils;
 
+import its_meow.mcmusicplayer.Ref;
 import its_meow.mcmusicplayer.proxy.CommonProxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
@@ -39,7 +40,7 @@ public class MusicManager {
 	UUID uuid;
 	File[] mp3s;
 	public boolean isPlaying;
-	Thread thread = null;
+	public Thread thread = null;
 	public double vol = 0.1;
 	boolean justPaused;
 
@@ -61,7 +62,7 @@ public class MusicManager {
 				File ogg = new File(songFolderOgg.getAbsolutePath() + "/" + mp3.getName().substring(0, mp3.getName().indexOf(".mp3")) + ".ogg");
 				if(!ogg.exists()) {
 					AudioConverter ac = new AudioConverter();
-					ac.encodeAudio(mp3, ogg, "audio/mp3");
+					ac.mp3ToOgg(mp3, ogg);
 				}
 				oggs[i] = ogg;
 			}
@@ -122,7 +123,7 @@ public class MusicManager {
 		if(trackNum == -1) {
 			playSong();
 		} else {
-			if(trackNum != 0) {
+			if(trackNum > 0) {
 				trackNum--;
 				stopSong(true); // Close old song
 				playSong();
@@ -143,7 +144,6 @@ public class MusicManager {
 				isPlaying = false;
 				ss.pause(uuid.toString());
 				justPaused = true;
-				ogg = null;
 				//ResourceLocation soundResLoc = new ResourceLocation(ogg.getAbsolutePath());
 				//ISound sound = new SoundThing(soundResLoc, String.valueOf(trackNum));
 				//Minecraft.getMinecraft().getSoundHandler().stopSound(sound);
@@ -159,7 +159,7 @@ public class MusicManager {
 		} else {
 			if(ogg != null) {
 				//ss.stop(uuid.toString());
-				if(continues) {
+				if(!continues) {
 					isPlaying = false;
 				}
 				ss.stop(uuid.toString());
@@ -198,14 +198,24 @@ public class MusicManager {
 			}
 		}
 		ogg = oggs[trackNum];
+		if(ogg == null) {
+			boolean breakme = false;
+			for(int i = mp3s.length - 1; i > 0 | breakme; i--) {
+				if(oggs[i] != null) {
+					trackNum = i;
+					breakme = true;
+				}
+			}
+		}
+		ogg = oggs[trackNum];
 		while(!ogg.exists()) {
 			trackNum++;
 			ogg = oggs[trackNum];
 		}
 		System.out.println("Playing File: " + ogg.getAbsoluteFile());
 		// Play Song
-		uuid = uuid.randomUUID();
 		if(!justPaused) {
+			uuid = uuid.randomUUID();
 			try {
 				ss.newStreamingSource(true, uuid.toString(), ogg.toURI().toURL(), ogg.getName(), false, 0, 0, 0, 1, 1);
 			} catch (MalformedURLException e) {

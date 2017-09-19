@@ -1,4 +1,4 @@
-package its_meow.mcmusicplayer;
+package its_meow.mcmusicplayer.music;
 
 import java.io.File;
 
@@ -10,9 +10,9 @@ import it.sauronsoftware.jave.EncodingAttributes;
 
 public class AudioConverter {
 
-    private static final Integer bitrate = 256000;
+    private static final Integer bitrate = 2560000; //10x more
     private static final Integer channels = 2; //2 for stereo, 1 for mono
-    private static final Integer samplingRate = 96000;
+    private static final Integer samplingRate = 48000; //48k is a good default
 
     /* Data structures for the audio 
      *  and Encoding attributes
@@ -46,20 +46,20 @@ public class AudioConverter {
 
     public void encodeAudio(File source, File target, String mimeType){
         //Change the hardcoded mime type later on
-        if(mimeType.equals("audio/mp3")){
+        //if(mimeType.equals("audio/mp3")){
             this.mp3ToOgg(source, target);
-        }
+        //}
     }
 
-    private void mp3ToOgg(File source, File target){
+    public void mp3ToOgg(File source, File target){
         //ADD CODE FOR CHANGING THE EXTENSION OF THE FILE
         encoAttrs.setFormat(oggFormat);
         audioAttr.setCodec(oggCodec);
         encoAttrs.setAudioAttributes(audioAttr);
         try{
-        encoder.encode(source, target, encoAttrs);
+        encoder.encode(source, target, encoAttrs, true);
         }catch(Exception e){
-            System.out.println("Encoding Failed");
+           e.printStackTrace();
         }
     }
 

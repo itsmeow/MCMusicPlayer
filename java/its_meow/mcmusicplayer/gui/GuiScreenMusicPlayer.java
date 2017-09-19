@@ -3,7 +3,7 @@ package its_meow.mcmusicplayer.gui;
 import java.io.IOException;
 
 import its_meow.mcmusicplayer.MCMusicPlayerMod;
-import its_meow.mcmusicplayer.MusicManager;
+import its_meow.mcmusicplayer.music.MusicManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -70,11 +70,11 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 		buttonNext = new GuiButton(5607, buttonPlay.x + 215, buttonPlay.y, 30, 20, "Next"); // Next 5607
 		buttonBack = new GuiButton(5605, buttonPlay.x - 45, buttonPlay.y, 30, 20, "Back"); // Back: 5605
 		buttonDone = new GuiButton(5608, width / 2 - 50, (height / 16) * 13, 100, 20, "Done"); // Done: 5608
-		buttonPause = new GuiButton(5609, buttonPlay.x, buttonPlay.y + 20, buttonPlay.width, buttonPlay.height, "Pause"); // Pause: 5609
-		buttonStop = new GuiButton(5610, buttonPlay.x + 50, buttonPlay.y + 40, 100, 20, "Stop");
+		buttonPause = new GuiButton(5609, buttonPlay.x, buttonPlay.y + 25, buttonPlay.width, buttonPlay.height, "Pause"); // Pause: 5609
+		buttonStop = new GuiButton(5610, buttonPlay.x + 50, buttonPlay.y + 50, 100, 20, "Stop");
 		buttonVolUp = new GuiButton(5611, buttonNext.x + 35, buttonNext.y, 30, 20, "+");
 		buttonVolDown = new GuiButton(5612, buttonBack.x - 35, buttonBack.y, 30, 20, "-");
-		buttonOpenSongs = new GuiButton(513, buttonDone.x, buttonDone.y + 25, 100, 20, "Open Song Folder");
+		buttonOpenSongs = new GuiButton(513, 0, height - 25, 100, 20, "Open Song Folder");
 
 		GuiButton[] buttons = {
 				buttonPlay,

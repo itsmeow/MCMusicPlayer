@@ -1,4 +1,4 @@
-package its_meow.mcmusicplayer;
+package its_meow.mcmusicplayer.music;
 
 import java.io.File;
 import java.io.FileFilter;

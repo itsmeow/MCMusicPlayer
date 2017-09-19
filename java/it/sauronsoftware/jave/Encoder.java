@@ -162,7 +162,7 @@ public class Encoder {
 				} else if (line.trim().equals("Codecs:")) {
 					evaluate = true;
 				}
-			reader.close();
+				reader.close();
 			}
 		} catch (IOException e) {
 			throw new EncoderException(e);
@@ -477,7 +477,7 @@ public class Encoder {
 	 *             If a problem occurs calling the underlying ffmpeg executable.
 	 */
 	public MultimediaInfo getInfo(File source) throws InputFormatException,
-			EncoderException {
+	EncoderException {
 		FFMPEGExecutor ffmpeg = locator.createExecutor();
 		ffmpeg.addArgument("-i");
 		ffmpeg.addArgument(source.getAbsolutePath());
@@ -514,7 +514,7 @@ public class Encoder {
 	 */
 	private MultimediaInfo parseMultimediaInfo(File source,
 			RBufferedReader reader) throws InputFormatException,
-			EncoderException {
+	EncoderException {
 		Pattern p1 = Pattern.compile("^\\s*Input #0, (\\w+).+$\\s*",
 				Pattern.CASE_INSENSITIVE);
 		Pattern p2 = Pattern.compile(
@@ -713,10 +713,10 @@ public class Encoder {
 	 * @throws EncoderException
 	 *             If a problems occurs during the encoding process.
 	 */
-	public void encode(File source, File target, EncodingAttributes attributes)
+	public void encode(File source, File target, EncodingAttributes attributes, boolean doOgg)
 			throws IllegalArgumentException, InputFormatException,
 			EncoderException {
-		encode(source, target, attributes, null);
+		encode(source, target, attributes, null, doOgg);
 	}
 
 	/**
@@ -744,8 +744,8 @@ public class Encoder {
 	 *             If a problems occurs during the encoding process.
 	 */
 	public void encode(File source, File target, EncodingAttributes attributes,
-			EncoderProgressListener listener) throws IllegalArgumentException,
-			InputFormatException, EncoderException {
+			EncoderProgressListener listener, boolean doOgg) throws IllegalArgumentException,
+	InputFormatException, EncoderException {
 		String formatAttribute = attributes.getFormat();
 		Float offsetAttribute = attributes.getOffset();
 		Float durationAttribute = attributes.getDuration();
@@ -758,78 +758,99 @@ public class Encoder {
 		target = target.getAbsoluteFile();
 		target.getParentFile().mkdirs();
 		FFMPEGExecutor ffmpeg = locator.createExecutor();
-		if (offsetAttribute != null) {
-			ffmpeg.addArgument("-ss");
-			ffmpeg.addArgument(String.valueOf(offsetAttribute.floatValue()));
-		}
-		ffmpeg.addArgument("-i");
-		ffmpeg.addArgument(source.getAbsolutePath());
-		if (durationAttribute != null) {
-			ffmpeg.addArgument("-t");
-			ffmpeg.addArgument(String.valueOf(durationAttribute.floatValue()));
-		}
-		if (videoAttributes == null) {
+		if(!doOgg) {
+			if (offsetAttribute != null) {
+				ffmpeg.addArgument("-ss");
+				ffmpeg.addArgument(String.valueOf(offsetAttribute.floatValue()));
+			}
+			ffmpeg.addArgument("-i");
+			ffmpeg.addArgument(source.getAbsolutePath());
+			if (durationAttribute != null) {
+				ffmpeg.addArgument("-t");
+				ffmpeg.addArgument(String.valueOf(durationAttribute.floatValue()));
+			}
+			if (videoAttributes == null) {
+				ffmpeg.addArgument("-vn");
+			} else {
+				String codec = videoAttributes.getCodec();
+				if (codec != null) {
+					ffmpeg.addArgument("-vcodec");
+					ffmpeg.addArgument(codec);
+				}
+				String tag = videoAttributes.getTag();
+				if (tag != null) {
+					ffmpeg.addArgument("-vtag");
+					ffmpeg.addArgument(tag);
+				}
+				Integer bitRate = videoAttributes.getBitRate();
+				if (bitRate != null) {
+					ffmpeg.addArgument("-b");
+					ffmpeg.addArgument(String.valueOf(bitRate.intValue()));
+				}
+				Integer frameRate = videoAttributes.getFrameRate();
+				if (frameRate != null) {
+					ffmpeg.addArgument("-r");
+					ffmpeg.addArgument(String.valueOf(frameRate.intValue()));
+				}
+				VideoSize size = videoAttributes.getSize();
+				if (size != null) {
+					ffmpeg.addArgument("-s");
+					ffmpeg.addArgument(String.valueOf(size.getWidth()) + "x"
+							+ String.valueOf(size.getHeight()));
+				}
+			}
+			if (audioAttributes == null) {
+				ffmpeg.addArgument("-an");
+			} else {
+				String codec = audioAttributes.getCodec();
+				if (codec != null) {
+					ffmpeg.addArgument("-acodec");
+					ffmpeg.addArgument(codec);
+				}
+				Integer bitRate = audioAttributes.getBitRate();
+				if (bitRate != null) {
+					ffmpeg.addArgument("-ab");
+					ffmpeg.addArgument(String.valueOf(bitRate.intValue()));
+				}
+				Integer channels = audioAttributes.getChannels();
+				if (channels != null) {
+					ffmpeg.addArgument("-ac");
+					ffmpeg.addArgument(String.valueOf(channels.intValue()));
+				}
+				Integer samplingRate = audioAttributes.getSamplingRate();
+				if (samplingRate != null) {
+					ffmpeg.addArgument("-ar");
+					ffmpeg.addArgument(String.valueOf(samplingRate.intValue()));
+				}
+				Integer volume = audioAttributes.getVolume();
+				if (volume != null) {
+					ffmpeg.addArgument("-vol");
+					ffmpeg.addArgument(String.valueOf(volume.intValue()));
+				}
+			}
+			ffmpeg.addArgument("-f");
+			ffmpeg.addArgument(formatAttribute);
+			ffmpeg.addArgument("-y");
+		} else {
+			ffmpeg.addArgument("-i");
+			ffmpeg.addArgument(source.getAbsolutePath());
 			ffmpeg.addArgument("-vn");
-		} else {
-			String codec = videoAttributes.getCodec();
-			if (codec != null) {
-				ffmpeg.addArgument("-vcodec");
-				ffmpeg.addArgument(codec);
-			}
-			String tag = videoAttributes.getTag();
-			if (tag != null) {
-				ffmpeg.addArgument("-vtag");
-				ffmpeg.addArgument(tag);
-			}
-			Integer bitRate = videoAttributes.getBitRate();
-			if (bitRate != null) {
-				ffmpeg.addArgument("-b");
-				ffmpeg.addArgument(String.valueOf(bitRate.intValue()));
-			}
-			Integer frameRate = videoAttributes.getFrameRate();
-			if (frameRate != null) {
-				ffmpeg.addArgument("-r");
-				ffmpeg.addArgument(String.valueOf(frameRate.intValue()));
-			}
-			VideoSize size = videoAttributes.getSize();
-			if (size != null) {
-				ffmpeg.addArgument("-s");
-				ffmpeg.addArgument(String.valueOf(size.getWidth()) + "x"
-						+ String.valueOf(size.getHeight()));
-			}
+			ffmpeg.addArgument("-acodec");
+			ffmpeg.addArgument("libvorbis");
+			//ffmpeg.addArgument("-strict");
+			//ffmpeg.addArgument("-2");
+			ffmpeg.addArgument("-ab");
+			ffmpeg.addArgument(String.valueOf(audioAttributes.getBitRate()));
+			ffmpeg.addArgument("-ac");
+			ffmpeg.addArgument(String.valueOf(audioAttributes.getChannels()));
+			ffmpeg.addArgument("-ar");
+			ffmpeg.addArgument(String.valueOf(audioAttributes.getSamplingRate()));
+			ffmpeg.addArgument("-aq");
+			ffmpeg.addArgument("10.0");
+			ffmpeg.addArgument("-f");
+			ffmpeg.addArgument("ogg");
+			ffmpeg.addArgument("-y");
 		}
-		if (audioAttributes == null) {
-			ffmpeg.addArgument("-an");
-		} else {
-			String codec = audioAttributes.getCodec();
-			if (codec != null) {
-				ffmpeg.addArgument("-acodec");
-				ffmpeg.addArgument(codec);
-			}
-			Integer bitRate = audioAttributes.getBitRate();
-			if (bitRate != null) {
-				ffmpeg.addArgument("-ab");
-				ffmpeg.addArgument(String.valueOf(bitRate.intValue()));
-			}
-			Integer channels = audioAttributes.getChannels();
-			if (channels != null) {
-				ffmpeg.addArgument("-ac");
-				ffmpeg.addArgument(String.valueOf(channels.intValue()));
-			}
-			Integer samplingRate = audioAttributes.getSamplingRate();
-			if (samplingRate != null) {
-				ffmpeg.addArgument("-ar");
-				ffmpeg.addArgument(String.valueOf(samplingRate.intValue()));
-			}
-			Integer volume = audioAttributes.getVolume();
-			if (volume != null) {
-				ffmpeg.addArgument("-vol");
-				ffmpeg.addArgument(String.valueOf(volume.intValue()));
-			}
-		}
-		ffmpeg.addArgument("-f");
-		ffmpeg.addArgument(formatAttribute);
-		ffmpeg.addArgument("-y");
 		ffmpeg.addArgument(target.getAbsolutePath());
 		try {
 			ffmpeg.execute();
@@ -860,6 +881,7 @@ public class Encoder {
 			int step = 0;
 			String line;
 			while ((line = reader.readLine()) != null) {
+				System.out.println(line);
 				if (step == 0) {
 					if (line.startsWith("WARNING: ")) {
 						if (listener != null) {
