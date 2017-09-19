@@ -114,7 +114,7 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 				buttonStop,
 				buttonVolUp,
 				buttonVolDown,
-				buttonOpenSongs
+				buttonOpenSongs //TODO: Finish
 		};
 
 		for(GuiButton button : buttons) {

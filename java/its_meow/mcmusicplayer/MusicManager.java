@@ -106,7 +106,7 @@ public class MusicManager {
 			stopSong(true); // Close old song
 			playSong();
 		} else {
-			if(trackNum <= mp3s.length - 1) {
+			if(trackNum < mp3s.length) {
 				trackNum++;
 				stopSong(true); // Close old song
 				playSong();
@@ -159,7 +159,7 @@ public class MusicManager {
 		} else {
 			if(ogg != null) {
 				//ss.stop(uuid.toString());
-				if(!continues) {
+				if(continues) {
 					isPlaying = false;
 				}
 				ss.stop(uuid.toString());
@@ -190,10 +190,10 @@ public class MusicManager {
 		}
 		ogg = oggs[trackNum];
 		if(ogg == null) {
-			for(int i = 0; i < 300; i++) {
+			for(int i = 0; i < mp3s.length; i++) {
 				if(oggs[i] != null) {
 					trackNum = i;
-					i = 300;
+					i = mp3s.length;
 				}
 			}
 		}
