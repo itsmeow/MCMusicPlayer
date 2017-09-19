@@ -19,12 +19,18 @@ import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EventHandler {
-
+	
+	GuiButton button;
+	
 	@SubscribeEvent
 	public void onGuiInit(InitGuiEvent.Post event) {
 		if(event.getGui() instanceof GuiIngameMenu) { // Make sure GUI is Escape menu
@@ -33,16 +39,16 @@ public class EventHandler {
 			ScaledResolution scaledRes = new ScaledResolution(mc);
 			int width = scaledRes.getScaledWidth();
 			int height = scaledRes.getScaledHeight();
-			GuiButton button = new GuiButton(5604, width / 2 - 100, (height / 8) * 6, "Music");
+			button = new GuiButton(5604, width / 2 - 100, (height / 16) * 13, "Music");
 			event.getButtonList().add(button);
 		}
 	}
 	
 	@SubscribeEvent
 	public void onGuiActionPerformed(ActionPerformedEvent event) {
-		if(event.getGui() instanceof GuiIngameMenu && event.getButton().id == 5604) { //Confirm my button was pressed
+		if(event.getGui() instanceof GuiIngameMenu && event.getButton() == button) { //Confirm my button was pressed
 			Minecraft mc = Minecraft.getMinecraft();
-			mc.displayGuiScreen(new GuiScreenMusicPlayer());
+			mc.displayGuiScreen(MCMusicPlayerMod.gui);
 		}
 	}
 

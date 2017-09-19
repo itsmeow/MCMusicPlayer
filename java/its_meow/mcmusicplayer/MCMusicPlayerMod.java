@@ -1,5 +1,6 @@
 package its_meow.mcmusicplayer;
 
+import its_meow.mcmusicplayer.gui.GuiScreenMusicPlayer;
 import its_meow.mcmusicplayer.proxy.CommonProxy;
 
 import org.apache.logging.log4j.Logger;
@@ -32,7 +33,7 @@ public class MCMusicPlayerMod {
 	
 	
 	public static MusicManager musicManager;
-	
+	public static GuiScreenMusicPlayer gui;
 
 	
 	@EventHandler
@@ -44,6 +45,8 @@ public class MCMusicPlayerMod {
 	public void init(FMLInitializationEvent e) {
 		proxy.Init(e);
 		musicManager = new MusicManager();
+		gui = new GuiScreenMusicPlayer();
+		gui.initGui();
 	}
 	
 	@EventHandler
