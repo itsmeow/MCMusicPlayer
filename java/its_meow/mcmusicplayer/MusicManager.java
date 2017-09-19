@@ -38,10 +38,9 @@ public class MusicManager {
 	SoundSystem ss;
 	UUID uuid;
 	File[] mp3s;
-	boolean isPlaying;
+	public boolean isPlaying;
 	Thread thread = null;
-	public float vol = 0.5F;
-	public boolean update = false;
+	public double vol = 0.1;
 	boolean justPaused;
 
 	public void init() {
@@ -54,7 +53,7 @@ public class MusicManager {
 			songFolderOgg.mkdirs();
 		}
 		mp3s = songsInFolder();
-		oggs = new File[300];
+		oggs = new File[mp3s.length];
 		System.out.println("Converting songs... Game may take a while to progress loading.");
 		for(int i = 0; i < mp3s.length; i++) {
 			File mp3 = mp3s[i];
@@ -104,16 +103,16 @@ public class MusicManager {
 
 	public void nextSong() {
 		if(trackNum == -1) {
-			stopSong(); // Close old song
+			stopSong(true); // Close old song
 			playSong();
 		} else {
-			if(trackNum != oggs.length) {
+			if(trackNum <= mp3s.length - 1) {
 				trackNum++;
-				stopSong(); // Close old song
+				stopSong(true); // Close old song
 				playSong();
 			} else {
 				trackNum = 0;
-				stopSong();
+				stopSong(true);
 				playSong();
 			}
 		}
@@ -125,11 +124,11 @@ public class MusicManager {
 		} else {
 			if(trackNum != 0) {
 				trackNum--;
-				stopSong(); // Close old song
+				stopSong(true); // Close old song
 				playSong();
 			} else {
-				trackNum = oggs.length;
-				stopSong(); // Close old song
+				trackNum = mp3s.length - 1;
+				stopSong(true); // Close old song
 				playSong();
 			}
 		}
@@ -144,6 +143,7 @@ public class MusicManager {
 				isPlaying = false;
 				ss.pause(uuid.toString());
 				justPaused = true;
+				ogg = null;
 				//ResourceLocation soundResLoc = new ResourceLocation(ogg.getAbsolutePath());
 				//ISound sound = new SoundThing(soundResLoc, String.valueOf(trackNum));
 				//Minecraft.getMinecraft().getSoundHandler().stopSound(sound);
@@ -153,14 +153,17 @@ public class MusicManager {
 		}
 	}
 
-	public void stopSong() {
+	public void stopSong(boolean continues) {
 		if(trackNum == -1) {
 			playSong();
 		} else {
 			if(ogg != null) {
 				//ss.stop(uuid.toString());
-				isPlaying = false;
+				if(!continues) {
+					isPlaying = false;
+				}
 				ss.stop(uuid.toString());
+				ogg = null;
 				//ResourceLocation soundResLoc = new ResourceLocation(ogg.getAbsolutePath());
 				//ISound sound = new SoundThing(soundResLoc, String.valueOf(trackNum));
 				//Minecraft.getMinecraft().getSoundHandler().stopSound(sound);
@@ -183,7 +186,7 @@ public class MusicManager {
 			}
 		}
 		if(ss.playing()) {
-			stopSong();
+			stopSong(true);
 		}
 		ogg = oggs[trackNum];
 		if(ogg == null) {
@@ -212,7 +215,7 @@ public class MusicManager {
 		} else {
 			justPaused = false;
 		}
-		ss.setVolume(uuid.toString(), vol);
+		ss.setVolume(uuid.toString(), (float) vol);
 		System.out.println("Preparing to play: " + ogg.getName());
 		ss.play(uuid.toString());
 		isPlaying = true;
@@ -222,13 +225,13 @@ public class MusicManager {
 			public void run() {
 				while(ss.initialized()) {
 					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					update = true;
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {}
 					if(!ss.playing() && isPlaying) {
 						nextSong();
+						try {
+							Thread.sleep(10000);
+						} catch (InterruptedException e) {}
 					}
 				}
 			} 
@@ -242,16 +245,18 @@ public class MusicManager {
 	}
 
 	public void volDown() {
-		if(vol - 0.05 >= 0) {
-			float newVol = vol - 0.05F;
-			ss.setVolume(uuid.toString(), newVol);
+		if(Math.round((vol - 0.02) * 100.0) / 100.0 >= 0) {
+			double newVol = Math.round((vol - 0.02) * 100.0) / 100.0;
+			ss.setVolume(uuid.toString(), (float) newVol);
+			vol = newVol;
 		}
 	}
 
 	public void volUp() {
-		if(vol + 0.05 <= 1) {
-			float newVol = vol + 0.05F;
-			ss.setVolume(uuid.toString(), newVol);
+		if(Math.round((vol + 0.02) * 100.0) / 100.0 <= 0.2) {
+			double newVol = Math.round((vol + 0.02) * 100.0) / 100.0;
+			ss.setVolume(uuid.toString(), (float) newVol);
+			vol = newVol;
 		}
 	}
 

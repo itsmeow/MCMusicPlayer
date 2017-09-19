@@ -23,34 +23,35 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 	public static GuiButton buttonStop;
 	public static GuiButton buttonVolUp;
 	public static GuiButton buttonVolDown;
+	public static GuiButton buttonOpenSongs;
 
 
 
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		initGui();
-		resetButtons();
 		this.drawDefaultBackground();
-		String text = "No Song Playing";
-		this.drawCenteredString(fontRenderer, text, buttonPlay.x - (int) (fontRenderer.getStringWidth(text) / 2), buttonPlay.y + 35, 0);
-		//this.drawCenteredString(fontRenderer, text, width / 2 - fontRenderer.getStringWidth(text), buttonPlay.y + 30, 0);
+		String text = musicManager.ogg == null ? "No Song Playing" : musicManager.trackNum + " - " + musicManager.ogg.getName().substring(0, musicManager.ogg.getName().indexOf('.'));
+		this.drawCenteredString(fontRenderer, text, width / 2, buttonPlay == null ? height / 2 - 55 : buttonPlay.y - 55, 0xFFFFFF);
+		String text2 = musicManager.ogg == null ? "" :  "Volume is: " + musicManager.vol * 50;
+		this.drawCenteredString(fontRenderer, text2, width / 2, buttonPlay == null ? height / 2 - 45 : buttonPlay.y - 45, 0xFFFFFF);
 		super.drawScreen(mouseX, mouseY, partialTicks);
 	}
-
+	/*
 	public void updateText() {
+		System.out.println("Updating text");
 		if(musicManager.ogg != null) {
+			System.out.println("ogg not null");
 			String name = musicManager.ogg.getName();
-			String nameNoExtension = name.substring(0, name.indexOf('.'));
-			if(musicManager.ogg != null) {
-				String text = musicManager.trackNum + " - " + nameNoExtension + " is Playing. Volume is: " + musicManager.vol;
-				this.drawCenteredString(fontRenderer, text, buttonPlay.x - fontRenderer.getStringWidth(text), buttonPlay.y + 35, 0);
-				//this.setText(musicManager.trackNum + " - " + nameNoExtension + " is Playing. Volume is: " + musicManager.vol, true);
-			} else { 
-				String text = "No Song Playing";
-				this.drawCenteredString(fontRenderer, text, buttonPlay.x - (int) (fontRenderer.getStringWidth(text) / 2), buttonPlay.y + 35, 0);
-			}
+			String nameNoExtension = musicManager.ogg.getName().substring(0, musicManager.ogg.getName().indexOf('.'));
+			String text = musicManager.trackNum + " - " + nameNoExtension + " is Playing. Volume is: " + musicManager.vol;
+			this.drawCenteredString(fontRenderer, text, buttonPlay.x, buttonPlay.y - 35, 0xFFFFFF));
+			//this.setText(musicManager.trackNum + " - " + nameNoExtension + " is Playing. Volume is: " + musicManager.vol, true);
+		} else { 
+			System.out.println("ogg null");
+			String text = "No Song Playing";
+			this.drawCenteredString(fontRenderer, text, buttonPlay.x, buttonPlay.y - 35, 0xFFFFFF);
 		}
-	}
+	}*/
 
 	@Override
 	public boolean doesGuiPauseGame() {
@@ -59,11 +60,11 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 
 	@Override
 	public void initGui() {
-
 		Minecraft mc = Minecraft.getMinecraft();
 		ScaledResolution scaledRes = new ScaledResolution(mc);
 		int width = scaledRes.getScaledWidth();
 		int height = scaledRes.getScaledHeight();
+		fontRenderer = mc.fontRenderer;
 
 		buttonPlay = new GuiButton(5606, width / 2 - 100, height / 2, 200, 20, "Play"); // Play: 5606
 		buttonNext = new GuiButton(5607, buttonPlay.x + 215, buttonPlay.y, 30, 20, "Next"); // Next 5607
@@ -73,6 +74,7 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 		buttonStop = new GuiButton(5610, buttonPlay.x + 50, buttonPlay.y + 40, 100, 20, "Stop");
 		buttonVolUp = new GuiButton(5611, buttonNext.x + 35, buttonNext.y, 30, 20, "+");
 		buttonVolDown = new GuiButton(5612, buttonBack.x - 35, buttonBack.y, 30, 20, "-");
+		buttonOpenSongs = new GuiButton(513, buttonDone.x, buttonDone.y + 25, 100, 20, "Open Song Folder");
 
 		GuiButton[] buttons = {
 				buttonPlay,
@@ -82,27 +84,23 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 				buttonPause,
 				buttonStop,
 				buttonVolUp,
-				buttonVolDown
+				buttonVolDown,
+				buttonOpenSongs,
 		};
 
 		//buttonStop.visible = false; // Stop is at the same location as play, so it is hidden.
 		//buttonStop.enabled = false; // And disabled, so it doesn't get "pressed" while not visible.
-
+		String text = "No Song Playing";
+		
+		this.drawCenteredString(fontRenderer, text, buttonPlay.x, buttonPlay.y - 35, 0xFFFFFF);
 		for(GuiButton button : buttons) {
 			this.buttonList.add(button);
 		}
 	}
-	
-	
-	
-	@Override
-	public void updateScreen() {
-		if(musicManager.update) {
-			musicManager.update = false;
-			updateText();
-		}
-		super.updateScreen();
-	}
+
+
+
+
 
 	public void resetButtons() {
 		this.buttonList.clear();
@@ -115,7 +113,8 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 				buttonPause,
 				buttonStop,
 				buttonVolUp,
-				buttonVolDown
+				buttonVolDown,
+				buttonOpenSongs
 		};
 
 		for(GuiButton button : buttons) {
@@ -125,14 +124,12 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 
 	@Override
 	protected void actionPerformed(GuiButton button) throws IOException {
-		if(musicManager.update) {
-			musicManager.update = false;
-			updateText();
-		}
-		
 		if(button == buttonDone) {
 			mc.displayGuiScreen(null);
 			this.onGuiClosed();
+		}
+		if(button == buttonOpenSongs) {
+			
 		}
 		if(button == buttonPlay) {
 			musicManager.playSong();
@@ -147,15 +144,13 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 			musicManager.pauseSong();
 		}
 		if(button == buttonStop) {
-			musicManager.stopSong();
+			musicManager.stopSong(false);
 		}
 		if(button == buttonVolUp) {
 			musicManager.volUp();
-			updateText();
 		}
 		if(button == buttonVolDown) {
 			musicManager.volDown();
-			updateText();
 		}
 	}
 

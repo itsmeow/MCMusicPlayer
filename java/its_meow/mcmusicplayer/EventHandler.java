@@ -21,6 +21,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -50,6 +51,15 @@ public class EventHandler {
 			Minecraft mc = Minecraft.getMinecraft();
 			mc.displayGuiScreen(MCMusicPlayerMod.gui);
 		}
+	}
+	
+	@Mod.EventHandler
+	public void onServerClosing(FMLServerStoppingEvent event) {
+		if(MCMusicPlayerMod.musicManager.thread != null) {
+			MCMusicPlayerMod.musicManager.thread.interrupt();
+		}
+		MCMusicPlayerMod.musicManager.thread = null;
+		MCMusicPlayerMod.musicManager.isPlaying = false;
 	}
 
 }
