@@ -120,18 +120,23 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 			OpenGlHelper.openFile(musicManager.songFolder);
 		}
 		if(button == buttonPlay) {
+			musicManager.mp3s = musicManager.songsInFolder();
 			musicManager.playSong();
 		}
 		if(button == buttonNext) {
+			musicManager.mp3s = musicManager.songsInFolder();
 			musicManager.nextSong();
 		}
 		if(button == buttonBack) {
+			musicManager.mp3s = musicManager.songsInFolder();
 			musicManager.lastSong();
 		}
 		if(button == buttonPause) {
+			musicManager.mp3s = musicManager.songsInFolder();
 			musicManager.pauseSong();
 		}
 		if(button == buttonStop) {
+			musicManager.mp3s = musicManager.songsInFolder();
 			musicManager.stopSong(false);
 		}
 		if(button == buttonVolUp) {

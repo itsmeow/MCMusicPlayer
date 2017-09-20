@@ -56,13 +56,15 @@ public class MusicManager {
 
 	public File[] songsInFolder() {
 		File[] files = songFolder.listFiles(new FileFilterMp3());
-		System.out.print("[" + Ref.MOD_ID +"] Songs loaded: [");
-		for(File file : files) {
-			System.out.print(file.getName());
-			System.out.print(",");
-		}
-		System.out.print("]");
-		System.out.println();
+		/*
+		 * System.out.print("[" + Ref.MOD_ID +"] Songs loaded: [");
+		 * for(File file : files) {
+		 *    System.out.print(file.getName());
+		 *    System.out.print(",");
+		 * }
+		 * System.out.print("]");
+		 * System.out.println();
+		 */
 		return files;
 	}
 
@@ -71,7 +73,7 @@ public class MusicManager {
 			stopSong(true); // Close old song
 			playSong();
 		} else {
-			if(trackNum < mp3s.length) {
+			if(trackNum < mp3s.length - 1) {
 				trackNum++;
 				stopSong(true); // Close old song
 				playSong();
@@ -140,7 +142,7 @@ public class MusicManager {
 		if(ss.playing()) {
 			stopSong(true);
 		}
-		mp3File = mp3s[trackNum];
+		/*mp3File = mp3s[trackNum];
 		if(mp3File == null) {
 			for(int i = 0; i < mp3s.length; i++) {
 				if(mp3s[i] != null) {
@@ -158,7 +160,7 @@ public class MusicManager {
 					breakme = true;
 				}
 			}
-		}
+		}*/
 		mp3File = mp3s[trackNum];
 		while(!mp3File.exists()) {
 			trackNum++;
@@ -187,22 +189,16 @@ public class MusicManager {
 				while(ss.initialized()) {
 					try {
 						Thread.sleep(5000);
-					} catch (InterruptedException e) {}
-					if(!ss.playing() && isPlaying) {
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					if(!ss.playing() && isPlaying && mp3File == null) {
 						nextSong();
-						try {
-							Thread.sleep(10000);
-						} catch (InterruptedException e) {}
 					}
 				}
 			} 
 		});
 		thread.start();
-		/*
-		ResourceLocation soundResLoc = new ResourceLocation(ogg.getAbsolutePath());
-		ISound sound = new SoundThing(soundResLoc, String.valueOf(trackNum));
-		Minecraft.getMinecraft().getSoundHandler().playSound(sound);
-		 */
 	}
 
 	public void volDown() {
