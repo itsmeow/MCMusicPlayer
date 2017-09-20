@@ -164,7 +164,6 @@ public class MusicManager {
 			trackNum++;
 			mp3File = mp3s[trackNum];
 		}
-		System.out.println("Playing File: " + mp3File.getAbsoluteFile());
 		// Play Song
 		if(!justPaused) {
 			uuid = uuid.randomUUID();
