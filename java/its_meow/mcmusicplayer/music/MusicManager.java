@@ -41,7 +41,7 @@ public class MusicManager {
 	public boolean isPlaying;
 	public Thread thread = null;
 	public double vol = 0.1;
-	boolean justPaused;
+	public boolean justPaused;
 
 	public void init() {
 		songFolder = new File(CommonProxy.configDirectory, "/mcmusicplayer/songs/");
@@ -114,6 +114,7 @@ public class MusicManager {
 	}
 
 	public void stopSong(boolean continues) {
+		justPaused = false;
 		if(trackNum == -1) {
 			playSong();
 		} else {

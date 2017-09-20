@@ -28,6 +28,7 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 	public static GuiButton buttonVolUp;
 	public static GuiButton buttonVolDown;
 	public static GuiButton buttonOpenSongs;
+	public static GuiButton buttonReloadSongs;
 
 
 
@@ -38,6 +39,11 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 		this.drawCenteredString(fontRenderer, text, width / 2, buttonPlay == null ? height / 2 - 55 : buttonPlay.y - 55, 0xFFFFFF);
 		String text2 = musicManager.mp3File == null ? "" :  "Volume is: " + (int) (musicManager.vol * 50);
 		this.drawCenteredString(fontRenderer, text2, width / 2, buttonPlay == null ? height / 2 - 45 : buttonPlay.y - 45, 0xFFFFFF);
+		if(musicManager.justPaused) {
+			String text3 = "Paused";
+			this.drawCenteredString(fontRenderer, text3, width / 2, height / 2 - 35, 0xFFFFFF);
+		}
+		
 		super.drawScreen(mouseX, mouseY, partialTicks);
 	}
 
@@ -62,7 +68,8 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 		buttonStop = new GuiButton(5610, buttonPlay.x + 50, buttonPlay.y + 50, 100, 20, "Stop");
 		buttonVolUp = new GuiButton(5611, buttonNext.x + 35, buttonNext.y, 30, 20, "+");
 		buttonVolDown = new GuiButton(5612, buttonBack.x - 35, buttonBack.y, 30, 20, "-");
-		buttonOpenSongs = new GuiButton(513, 0, height - 25, 100, 20, "Open Songs Folder");
+		buttonOpenSongs = new GuiButton(5613, 0, height - 25, 100, 20, "Open Songs Folder");
+		buttonReloadSongs = new GuiButton(5614, buttonOpenSongs.x, buttonOpenSongs.y - 25, 100, 20, "Reload Songs");
 
 		GuiButton[] buttons = {
 				buttonPlay,
@@ -74,10 +81,9 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 				buttonVolUp,
 				buttonVolDown,
 				buttonOpenSongs,
+				buttonReloadSongs,
 		};
 
-		//buttonStop.visible = false; // Stop is at the same location as play, so it is hidden.
-		//buttonStop.enabled = false; // And disabled, so it doesn't get "pressed" while not visible.
 		String text = "No Song Playing";
 		
 		this.drawCenteredString(fontRenderer, text, buttonPlay.x, buttonPlay.y - 35, 0xFFFFFF);
@@ -102,7 +108,8 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 				buttonStop,
 				buttonVolUp,
 				buttonVolDown,
-				buttonOpenSongs //TODO: Finish
+				buttonOpenSongs,
+				buttonReloadSongs,
 		};
 
 		for(GuiButton button : buttons) {
@@ -119,24 +126,23 @@ public class GuiScreenMusicPlayer extends GuiScreen {
 		if(button == buttonOpenSongs) {
 			OpenGlHelper.openFile(musicManager.songFolder);
 		}
-		if(button == buttonPlay) {
+		if(button == buttonReloadSongs) {
 			musicManager.mp3s = musicManager.songsInFolder();
+			musicManager.stopSong(false);
+		}
+		if(button == buttonPlay) {
 			musicManager.playSong();
 		}
 		if(button == buttonNext) {
-			musicManager.mp3s = musicManager.songsInFolder();
 			musicManager.nextSong();
 		}
 		if(button == buttonBack) {
-			musicManager.mp3s = musicManager.songsInFolder();
 			musicManager.lastSong();
 		}
 		if(button == buttonPause) {
-			musicManager.mp3s = musicManager.songsInFolder();
 			musicManager.pauseSong();
 		}
 		if(button == buttonStop) {
-			musicManager.mp3s = musicManager.songsInFolder();
 			musicManager.stopSong(false);
 		}
 		if(button == buttonVolUp) {
