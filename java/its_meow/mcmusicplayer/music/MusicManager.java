@@ -31,14 +31,13 @@ import paulscode.sound.SoundSystemConfig;
 
 public class MusicManager {
 
-	File songFolder;
+	public File songFolder;
 	File songFolderOgg;
-	public File[] oggs;
+	public File[] mp3s;
 	public int trackNum = -1;
-	public File ogg;
+	public File mp3File;
 	SoundSystem ss;
 	UUID uuid;
-	File[] mp3s;
 	public boolean isPlaying;
 	public Thread thread = null;
 	public double vol = 0.1;
@@ -49,42 +48,7 @@ public class MusicManager {
 		if(!songFolder.exists()) {
 			songFolder.mkdirs();
 		}
-		songFolderOgg = new File(CommonProxy.configDirectory, "/mcmusicplayer/songs/oggs");
-		if(!songFolderOgg.exists()) {
-			songFolderOgg.mkdirs();
-		}
 		mp3s = songsInFolder();
-		oggs = new File[mp3s.length];
-		System.out.println("Converting songs... Game may take a while to progress loading.");
-		for(int i = 0; i < mp3s.length; i++) {
-			File mp3 = mp3s[i];
-			if(mp3 != null) {
-				File ogg = new File(songFolderOgg.getAbsolutePath() + "/" + mp3.getName().substring(0, mp3.getName().indexOf(".mp3")) + ".ogg");
-				if(!ogg.exists()) {
-					AudioConverter ac = new AudioConverter();
-					ac.mp3ToOgg(mp3, ogg);
-				}
-				oggs[i] = ogg;
-			}
-		}
-		/*
-		Thread thread = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				getsndSystem();
-				for(File ogg : oggs) {
-					try {
-						ss.loadSound(ogg.toURI().toURL(), ogg.getName());
-					} catch (MalformedURLException e) {
-						e.printStackTrace();
-					}
-				}
-			} 
-		});
-		thread.start();*/
-
-
 	}
 
 
@@ -139,16 +103,10 @@ public class MusicManager {
 		if(trackNum == -1) {
 			playSong();
 		} else {
-			if(ogg != null) {
-				//ss.stop(uuid.toString());
+			if(mp3File != null) {
 				isPlaying = false;
 				ss.pause(uuid.toString());
 				justPaused = true;
-				//ResourceLocation soundResLoc = new ResourceLocation(ogg.getAbsolutePath());
-				//ISound sound = new SoundThing(soundResLoc, String.valueOf(trackNum));
-				//Minecraft.getMinecraft().getSoundHandler().stopSound(sound);
-			} else {
-				//playSong();
 			}
 		}
 	}
@@ -157,29 +115,23 @@ public class MusicManager {
 		if(trackNum == -1) {
 			playSong();
 		} else {
-			if(ogg != null) {
-				//ss.stop(uuid.toString());
+			if(mp3File != null) {
 				if(!continues) {
 					isPlaying = false;
 				}
 				ss.stop(uuid.toString());
-				ogg = null;
-				//ResourceLocation soundResLoc = new ResourceLocation(ogg.getAbsolutePath());
-				//ISound sound = new SoundThing(soundResLoc, String.valueOf(trackNum));
-				//Minecraft.getMinecraft().getSoundHandler().stopSound(sound);
-			} else {
-				//playSong();
+				mp3File = null;
+				ss.removeSource(uuid.toString());
 			}
 		}
 	}
 
 	public void playSong() {
-		//init();
 		if(ss == null) {
 			getsndSystem();
 		}
 		if(trackNum == -1) {
-			if(oggs.length > 0) {
+			if(mp3s.length > 0) {
 				trackNum = 0;
 			} else {
 				return;
@@ -188,36 +140,36 @@ public class MusicManager {
 		if(ss.playing()) {
 			stopSong(true);
 		}
-		ogg = oggs[trackNum];
-		if(ogg == null) {
+		mp3File = mp3s[trackNum];
+		if(mp3File == null) {
 			for(int i = 0; i < mp3s.length; i++) {
-				if(oggs[i] != null) {
+				if(mp3s[i] != null) {
 					trackNum = i;
 					i = mp3s.length;
 				}
 			}
 		}
-		ogg = oggs[trackNum];
-		if(ogg == null) {
+		mp3File = mp3s[trackNum];
+		if(mp3File == null) {
 			boolean breakme = false;
 			for(int i = mp3s.length - 1; i > 0 | breakme; i--) {
-				if(oggs[i] != null) {
+				if(mp3s[i] != null) {
 					trackNum = i;
 					breakme = true;
 				}
 			}
 		}
-		ogg = oggs[trackNum];
-		while(!ogg.exists()) {
+		mp3File = mp3s[trackNum];
+		while(!mp3File.exists()) {
 			trackNum++;
-			ogg = oggs[trackNum];
+			mp3File = mp3s[trackNum];
 		}
-		System.out.println("Playing File: " + ogg.getAbsoluteFile());
+		System.out.println("Playing File: " + mp3File.getAbsoluteFile());
 		// Play Song
 		if(!justPaused) {
 			uuid = uuid.randomUUID();
 			try {
-				ss.newStreamingSource(true, uuid.toString(), ogg.toURI().toURL(), ogg.getName(), false, 0, 0, 0, 1, 1);
+				ss.newStreamingSource(true, uuid.toString(), mp3File.toURI().toURL(), mp3File.getName(), false, 0, 0, 0, 1, 1);
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}
@@ -226,7 +178,7 @@ public class MusicManager {
 			justPaused = false;
 		}
 		ss.setVolume(uuid.toString(), (float) vol);
-		System.out.println("Preparing to play: " + ogg.getName());
+		System.out.println("Preparing to play: " + mp3File.getName());
 		ss.play(uuid.toString());
 		isPlaying = true;
 		thread = new Thread(new Runnable() {
